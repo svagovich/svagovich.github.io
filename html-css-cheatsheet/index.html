@@ -1,0 +1,255 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="./resources/styles/styles.css">
+        <!-- Стили темы (например, Tomorrow Night) -->
+        <link rel="stylesheet" href="./resources/styles/prism.css">
+        <!-- Сам скрипт подсветки -->
+        <script src="./resources/scripts/prism.js"></script>
+        <!-- Дополнение для поддержки HTML/XML -->
+        <script src="https://cloudflare.com"></script>
+    </head>
+
+    <body>
+        <div>
+        <h1 class="tables">
+            Таблички
+        </h1>
+
+    <table class="table-cake">
+        
+        <!-- Заголовок над таблицей -->
+        <caption>&lt;caption&gt; — НАЗВАНИЕ ТАБЛИЦЫ</caption>
+        
+        <!-- Верхний слой (Шапка) -->
+        <thead>
+            <tr>
+                <th>&lt;thead&gt; → &lt;tr&gt; → &lt;th&gt; (Ячейка-заголовок 1)</th>
+                <th>&lt;thead&gt; → &lt;tr&gt; → &lt;th&gt; (Ячейка-заголовок 2)</th>
+            </tr>
+        </thead>
+        
+        <!-- Средний слой (Контент / Основное тело) -->
+        <tbody>
+            <tr>
+                <td>&lt;tbody&gt; → &lt;tr&gt; → &lt;td&gt; (Строка 1, ячейка 1)</td>
+                <td>&lt;tbody&gt; → &lt;tr&gt; → &lt;td&gt; (Строка 1, ячейка 2)</td>
+            </tr>
+            <tr>
+                <td>&lt;tbody&gt; → &lt;tr&gt; → &lt;td&gt; (Строка 2, ячейка 1)</td>
+                <td>&lt;tbody&gt; → &lt;tr&gt; → &lt;td&gt; (Строка 2, ячейка 2)</td>
+            </tr>
+        </tbody>
+        
+        <!-- Нижний слой (Подвал / Итоги) -->
+        <tfoot>
+            <tr>
+                <td>&lt;tfoot&gt; → &lt;tr&gt; → &lt;td&gt; (Итог 1)</td>
+                <td>&lt;tfoot&gt; → &lt;tr&gt; → &lt;td&gt; (Итог 2)</td>
+            </tr>
+        </tfoot>
+
+    </table>
+
+        <h2>Формат записи:</h2>
+
+<pre><code class="language-html">&lt;table&gt;
+  &lt;caption&gt;Название таблицы&lt;/caption&gt;
+  
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Ячейка-заголовок 1&lt;/th&gt;
+      &lt;th&gt;Ячейка-заголовок 2&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Строка 1, ячейка 1&lt;/td&gt;
+      &lt;td&gt;Строка 1, ячейка 2&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Строка 2, ячейка 1&lt;/td&gt;
+      &lt;td&gt;Строка 2, ячейка 2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  
+  &lt;tfoot&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Итог 1&lt;/td&gt;
+      &lt;td&gt;Итог 2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tfoot&gt;
+&lt;/table&gt;</code></pre>
+
+        </div>
+
+        <div>
+            <h1 class="random-fonts">
+                <!-- Слово: Подрубаем -->
+                 <span class="f1">П</span><span class="f2">о</span><span class="f3">д</span><span class="f4">р</span><span class="f5">у</span><span class="f6">б</span><span class="f7">а</span><span class="f1">е</span><span class="f2">м</span>
+  
+                 &nbsp; <!-- Пробел между словами -->
+  
+                <!-- Слово: шрифты -->
+                <span class="f3">ш</span><span class="f4">р</span><span class="f5">и</span><span class="f6">ф</span><span class="f7">т</span><span class="f1">ы</span>
+            </h1>
+            <h2>Подключение с сайта:</h2>
+            <p class="generation">Генерируем ссылку на сайте: <a href="https://google.com" class="inline-link-btn" target="_blank">https://google.com</a></p>
+            <p class="generation">Вставляем:</p>
+
+<pre><code class="language-html">&lt;head&gt;
+  &lt;link href="https://googleapis.com.." rel="stylesheet"&gt;
+&lt;/head&gt;
+</code></pre>
+
+            <h2>Подключение из файла (в CSS):</h2>
+
+<pre><code class="language-css">@font-face {
+  font-family: 'MyCustomFont'; /* 1. Придумываем любое имя для шрифта */
+  src: url('fonts/MyFont.woff2') format('woff2'), /* 2. Основной современный формат */
+       url('fonts/MyFont.woff') format('woff');   /* 3. Запасной для старых браузеров */
+  
+  font-weight: normal; /* Насыщенность (normal, bold или цифры 400, 700) */
+  font-style: normal;  /* Стиль (normal или italic) */
+  font-display: swap;  /* Чтобы текст не исчезал, пока шрифт скачивается */
+}</code></pre>
+
+        </div>
+
+        <div class="semantic">
+
+            <h1>Семантический HTML</h1>
+
+                <table>
+        <thead>
+            <tr>
+                <th style="width: 10%">Тег</th>
+                <th style="width: 25%">Назначение блока</th>
+                <th style="width: 40%">Пример использования</th>
+                <th style="width: 25%">Важное правило / Особенность</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="tag-name">&lt;header&gt;</td>
+                <td class="desc-text">Шапка сайта, текущего раздела или отдельной статьи.</td>
+                <td><pre><code class="language-html">&lt;header&gt;
+  &lt;img src="logo.png" alt="Лого"&gt;
+  &lt;h1&gt;Название блога&lt;/h1&gt;
+&lt;/header&gt;</code></pre></td>
+                <td class="rule-text">Может встречаться на странице несколько раз (в начале всей страницы и внутри тегов &lt;article&gt;).</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;nav&gt;</td>
+                <td class="desc-text">Главный блок с навигационными ссылками.</td>
+                <td><pre><code class="language-html">&lt;nav&gt;
+  &lt;a href="/"&gt;Главная&lt;/a&gt;
+  &lt;a href="/catalog"&gt;Каталог&lt;/a&gt;
+&lt;/nav&gt;</code></pre></td>
+                <td class="rule-text">Используется для основных меню, пагинации и хлебных крошек. Одиночные ссылки в тексте оборачивать не нужно.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;main&gt;</td>
+                <td class="desc-text">Главное, уникальное содержимое конкретной страницы.</td>
+                <td><pre><code class="language-html">&lt;main&gt;
+  &lt;h1&gt;Каталог товаров&lt;/h1&gt;
+  &lt;!-- Основной контент --&gt;
+&lt;/main&gt;</code></pre></td>
+                <td class="rule-text"><strong>Строго один</strong> на странице. Нельзя вкладывать внутрь &lt;header&gt;, &lt;footer&gt; или &lt;aside&gt;.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;section&gt;</td>
+                <td class="desc-text">Крупный смысловой раздел документа.</td>
+                <td><pre><code class="language-html">&lt;section&gt;
+  &lt;h2&gt;Наши услуги&lt;/h2&gt;
+  &lt;p&gt;Описание услуг...&lt;/p&gt;
+&lt;/section&gt;</code></pre></td>
+                <td class="rule-text">Каждая секция должна содержать собственный заголовок (h2-h6). Не используйте элемент просто как обертку для стилей.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;article&gt;</td>
+                <td class="desc-text">Автономный, независимый блок информации.</td>
+                <td><pre><code class="language-html">&lt;article&gt;
+  &lt;h2&gt;Новость дня&lt;/h2&gt;
+  &lt;p&gt;Текст новости...&lt;/p&gt;
+&lt;/article&gt;</code></pre></td>
+                <td class="rule-text">Подходит для постов, комментариев или карточек товаров, которые можно без потери смысла перенести на другой ресурс.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;aside&gt;</td>
+                <td class="desc-text">Дополнительный контент, косвенно связанный с основным.</td>
+                <td><pre><code class="language-html">&lt;aside&gt;
+  &lt;h3&gt;Популярное&lt;/h3&gt;
+  &lt;ul&gt;...&lt;/ul&gt;
+&lt;/aside&gt;</code></pre></td>
+                <td class="rule-text">Используется для сайдбаров, блоков рекламы, виджетов или списков похожих материалов.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;footer&gt;</td>
+                <td class="desc-text">Подвал сайта, раздела или отдельной статьи.</td>
+                <td><pre><code class="language-html">&lt;footer&gt;
+  &lt;p&gt;&amp;copy; 2026 Моя Компания&lt;/p&gt;
+&lt;/footer&gt;</code></pre></td>
+                <td class="rule-text">Обычно содержит информацию об авторе, копирайты, контакты и ссылки на юридические документы.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;figure&gt;</td>
+                <td class="desc-text">Самодостаточный медиа-контент (фото, схемы, куски кода).</td>
+                <td><pre><code class="language-html">&lt;figure&gt;
+  &lt;img src="chart.png" alt="Схема"&gt;
+  &lt;figcaption&gt;Рис. 1 — График&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre></td>
+                <td class="rule-text">Если убрать этот блок в конец страницы, основной текст не должен потерять логический смысл.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;figcaption&gt;</td>
+                <td class="desc-text">Подпись или заголовок для содержимого &lt;figure&gt;.</td>
+                <td><span style="color: var(--text-muted)">См. пример выше для &lt;figure&gt;</span></td>
+                <td class="rule-text">Должен располагаться первым или самым последним элементом внутри &lt;figure&gt;.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;time&gt;</td>
+                <td class="desc-text">Машиночитаемая дата и время.</td>
+                <td><pre><code class="language-html">&lt;p&gt;Опубликовано 
+  &lt;time datetime="2026-07-29"&gt;сегодня&lt;/time&gt;
+&lt;/p&gt;</code></pre></td>
+                <td class="rule-text">Атрибут <code>datetime</code> передает точную дату поисковикам, а текст внутри тега виден пользователям.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;address&gt;</td>
+                <td class="desc-text">Контактная информация автора или организации.</td>
+                <td><pre><code class="language-html">&lt;address&gt;
+  Пишите на &lt;a href="mailto:i@site.com"&gt;i@site.com&lt;/a&gt;.
+  г. Москва, ул. Ленина 1
+&lt;/address&gt;</code></pre></td>
+                <td class="rule-text">Не используйте для произвольных почтовых адресов, которые не связаны напрямую с контактами владельцев страницы.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;mark&gt;</td>
+                <td class="desc-text">Текст, выделенный для привлечения внимания (как маркером).</td>
+                <td><pre><code class="language-html">&lt;p&gt;Акция: скидки 
+  &lt;mark&gt;до 70%&lt;/mark&gt; только в июле!
+&lt;/p&gt;</code></pre></td>
+                <td class="rule-text">По умолчанию браузеры подсвечивают этот текст ярким желтым фоном.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;details&gt;</td>
+                <td class="desc-text">Интерактивный раскрывающийся блок (аккордеон/спойлер).</td>
+                <td><pre><code class="language-html">&lt;details&gt;
+  &lt;summary&gt;Частые вопросы&lt;/summary&gt;
+  &lt;p&gt;Ответ на ваш вопрос...&lt;/p&gt;
+&lt;/details&gt;</code></pre></td>
+                <td class="rule-text">Работает стандартными средствами HTML без единой строчки JavaScript. Открытое состояние задается атрибутом <code>open</code>.</td>
+            </tr>
+            <tr>
+                <td class="tag-name">&lt;summary&gt;</td>
+                <td class="desc-text">Заголовок раскрывающегося блока &lt;details&gt;.</td>
+                <td><span style="color: var(--text-muted)">См. пример выше для &lt;details&gt;</span></td>
+                <td class="rule-text">По клику на него скрытая часть &lt;details&gt; разворачивается или сворачивается.</td>
+            </tr>
+        </tbody>
+    </table>
+
+        </div>
+    </body>
+</html>
