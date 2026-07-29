@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World of Lok'tar</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #0b0c10;
+    color: #e8e6df;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    min-height: 100%;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 24px 12px 60px;
+  }
+  #app {
+    width: 100%;
+    max-width: 760px;
+  }
+  .panel {
+    background: #1f2128;
+    border: 4px solid #383a40;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 0 2px #0b0c10 inset;
+  }
+  h1.title {
+    text-align: center;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: #ffd166;
+    text-shadow: 3px 3px 0 #5a3d00;
+    margin: 6px 0 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #8a8f98;
+    font-size: 13px;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+  }
+  canvas.art {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+    margin: 0 auto 14px;
+    width: 200px;
+    height: 200px;
+    background: #12131a;
+    border: 4px solid #383a40;
+  }
+  #storyText {
+    font-size: 17px;
+    line-height: 1.6;
+    min-height: 140px;
+    cursor: pointer;
+    white-space: pre-wrap;
+  }
+  #storyText .hint {
+    display: block;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #55585f;
+    text-align: right;
+  }
+  .fx-shake {
+    display: inline-block;
+    color: #ff3333;
+    animation: shakeFx 0.18s infinite;
+    text-shadow: 1px 1px 0 #560000;
+  }
+  @keyframes shakeFx {
+    0%   { transform: translate(0,0) rotate(0deg); }
+    20%  { transform: translate(-2px,1px) rotate(-3deg); }
+    40%  { transform: translate(2px,-1px) rotate(3deg); }
+    60%  { transform: translate(-1px,-2px) rotate(-2deg); }
+    80%  { transform: translate(1px,2px) rotate(2deg); }
+    100% { transform: translate(0,0) rotate(0deg); }
+  }
+  .fx-glow {
+    display: inline-block;
+    color: #ffe27a;
+    animation: glowFx 1.6s ease-in-out infinite;
+  }
+  @keyframes glowFx {
+    0%, 100% { text-shadow: 0 0 4px #ffd166, 0 0 2px #ffd166; color: #ffe27a; }
+    50%      { text-shadow: 0 0 12px #56ccf2, 0 0 6px #56ccf2; color: #bdeeff; }
+  }
+  .fx-fade {
+    display: inline-block;
+    opacity: 0.45;
+    transform: translateY(2px);
+  }
+  #choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  button.choiceBtn {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 15px;
+    background: #2a2d36;
+    color: #e8e6df;
+    border: 3px solid #4b4f59;
+    padding: 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    image-rendering: pixelated;
+    transition: none;
+  }
+  button.choiceBtn:hover:not(:disabled) {
+    background: #3a3e4a;
+    border-color: #ffd166;
+    color: #ffd166;
+  }
+  button.choiceBtn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  button.choiceBtn::before {
+    content: "▸ ";
+    color: #ffd166;
+  }
+  #charSelect {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 620px) {
+    #charSelect { grid-template-columns: repeat(3, 1fr); }
+  }
+  .charCard {
+    background: #22242c;
+    border: 3px solid #4b4f59;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .charCard:hover {
+    border-color: #ffd166;
+  }
+  .charCard canvas {
+    width: 96px; height: 96px;
+    image-rendering: pixelated;
+    background: #12131a;
+    border: 3px solid #383a40;
+    margin-bottom: 8px;
+  }
+  .charCard h3 {
+    color: #ffd166;
+    font-size: 15px;
+    margin: 4px 0;
+  }
+  .charCard p {
+    font-size: 12px;
+    color: #b7bac1;
+    line-height: 1.5;
+  }
+  .flagRow {
+    text-align: center;
+    color: #55585f;
+    font-size: 11px;
+    margin-top: -6px;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  #restartWrap {
+    text-align: center;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="title">WORLD OF LOK'TAR</h1>
+  <div class="subtitle">текстовая адвенчура по мотивам чата "Двойное яблоко"</div>
+
+  <div class="panel" id="artPanel">
+    <canvas id="artCanvas" class="art" width="32" height="32"></canvas>
+  </div>
+
+  <div class="panel" id="mainPanel">
+    <div id="charSelectWrap">
+      <div id="charSelect"></div>
+    </div>
+    <div id="storyWrap" style="display:none;">
+      <div id="storyText"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="choicesPanel" style="display:none;">
+    <div id="choices"></div>
+    <div id="restartWrap" style="display:none;">
+      <button class="choiceBtn" id="restartBtn">Начать заново</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== АУДИО ДВИЖОК ===================== */
+let audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playBlip(freq, type) {
+  try {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    const t0 = audioCtx.currentTime;
+    gain.gain.setValueAtTime(0.16, t0);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.035);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(t0);
+    osc.stop(t0 + 0.045);
+  } catch (e) { /* тихо игнорируем, если аудио недоступно */ }
+}
+let blipCounter = 0;
+function voiceBlip(voiceId, ch) {
+  if (ch === ' ' || ch === '\n') return;
+  blipCounter++;
+  if (voiceId === 'mark') {
+    if (blipCounter % 3 === 0) playBlip(130, 'square');
+  } else if (voiceId === 'drosip') {
+    playBlip(450, 'square');
+  } else if (voiceId === 'donimazik') {
+    playBlip(200 + Math.random() * 150, 'triangle');
+  } else {
+    playBlip(300, 'triangle');
+  }
+}
+
+/* ===================== ГЕРОИ ===================== */
+const HEROES = {
+  mark: {
+    id: 'mark',
+    name: "Тролль Марк, Сын Марка",
+    voice: 'mark',
+    item: 'item_mouse',
+    itemText: "потрёпанную [glow]игровую мышку[/glow] с оторванным проводом — верную спутницу всех каток на классике.",
+    desc: "Легенда района. В детстве обещал маме бросить игры \"после этой партишки\". Партишка идёт третий год. Ненавидит автобусы, Valve и понедельники — примерно в этом порядке.",
+    portrait: drawPortraitMark
+  },
+  drosip: {
+    id: 'drosip',
+    name: "Гоблин Дросип",
+    voice: 'drosip',
+    item: 'item_receipt',
+    itemText: "мятую квитанцию на [glow]загранпаспорт[/glow] — очередь там расписана примерно до вторника следующего века.",
+    desc: "Официально нигде не должен, неофициально должен всем. Мечтает о второй работе, третьей подработке и справке, которая наконец закроет вопрос со справками.",
+    portrait: drawPortraitDrosip
+  },
+  donimazik: {
+    id: 'donimazik',
+    name: "Дони-Мазик",
+    voice: 'donimazik',
+    item: 'item_mayo',
+    itemText: "банку [glow]майонеза[/glow] неизвестного производства — початую, начатую и почему-то ещё тёплую.",
+    desc: "Мастер майонезных искусств и бытовых катастроф. Просыпается с философскими откровениями, ложится с новыми вопросами к мирозданию. Ребрышки биг сайз — его стихия.",
+    portrait: drawPortraitDonimazik
+  }
+};
+
+/* ===================== СОСТОЯНИЕ ===================== */
+const state = {
+  heroId: null,
+  sceneId: null,
+  flags: {}
+};
+
+/* ===================== СЦЕНЫ ===================== */
+const scenes = {
+
+  intro: {
+    text: "Ты открываешь глаза посреди [glow]Лок'тар[/glow] — мира, где эпик фэнтези встречает будни спального района. Пахнет костром, [fade]усталостью[/fade] и чьим-то забытым шаурмячным пакетом.\n\nВдалеке ревёт мотор — будто целая колонна маршруток решила наконец показать характер.\n\nЧто будешь делать, {heroName}?",
+    illustration: 'intro_forest',
+    voice: 'hero',
+    choices: [
+      { text: "Пойти на рёв мотора", next: "hear_bus" },
+      { text: "Проверить карманы", next: "check_pockets" }
+    ]
+  },
+
+  hear_bus: {
+    text: "За поворотом — целая вереница расписных [glow]бусиков[/glow]. На борту каждого намалёвано: «БУСИФИКАЦИЯ 2.0». Диспетчер с планшетом орёт в мегафон:\n\n\"Все по повестке — на выход, штурмовать соседний квест! Инвентарь и совесть сдать в багажное отделение!\"\n\nТы явно на эту рассылку не подписывался.",
+    illustration: 'bus_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Спрятаться в кустах", next: "hide_bushes" },
+      { text: "Крикнуть \"Я по повестке!\" и запрыгнуть", next: "board_bus" }
+    ]
+  },
+
+  hide_bushes: {
+    text: "Ты ныряешь в кусты с ловкостью человека, который уже прятался так однажды — от классного руководителя. Бусик уезжает без тебя.\n\nДиспетчер кричит вслед: \"[shake]ОТКАЗАНО[/shake] дезертирам полдника!\"\n\nПереждав шум, ты замечаешь неподалёку тёплую вывеску: кабак «[glow]Жидкое Мужество[/glow]».",
+    illustration: 'tavern_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Зайти в кабак", next: "tavern_arrival" }
+    ]
+  },
+
+  board_bus: {
+    text: "Ты запрыгиваешь в бусик. Внутри уже сидят три тролля и один гоблин, который явно кому-то должен денег. Мотор глохнет ровно через 200 метров.\n\nВодитель философски изрекает: \"[fade]Рассосалось[/fade] само собой, как обычно\", — и все молча начинают вылезать через люк.",
+    illustration: 'bus_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Незаметно свалить пешком", next: "bus_breakdown" },
+      { text: "Остаться и попробовать починить бусик самому", next: "game_over_bus" }
+    ]
+  },
+
+  bus_breakdown: {
+    text: "Пока бусик чинят такой же ленивой магией, какой чинят интернет в подъезде, ты незаметно сваливаешь пешком.\n\nВпереди маячит тёплая вывеска: кабак «[glow]Жидкое Мужество[/glow]».",
+    illustration: 'tavern_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Зайти в кабак", next: "tavern_arrival" }
+    ]
+  },
+
+  game_over_bus: {
+    text: "Ты лезешь чинить магический двигатель, дёргаешь не тот проводок — и раздаётся хлопок. Тебя вместе с капотом уносит в неизвестном направлении.\n\nГде-то там до сих пор ищут твои кроссовки.\n\n[shake]ПОТРАЧЕНО[/shake]",
+    illustration: 'gameover_scene',
+    voice: 'narrator',
+    ending: true
+  },
+
+  check_pockets: {
+    text: function () {
+      const h = HEROES[state.heroId];
+      return "Ты роешься по карманам и находишь " + h.itemText + "\n\nПригодится — вопрос лишь в том, для чего именно.";
+    },
+    illustration: 'pockets_item',
+    voice: 'hero',
+    onEnter: function (heroId, flags) {
+      flags[HEROES[heroId].item] = true;
+    },
+    choices: [
+      { text: "Идти на звук мотора", next: "hear_bus" },
+      { text: "Пойти напрямик к огонькам вдалеке", next: "tavern_arrival" }
+    ]
+  },
+
+  tavern_arrival: {
+    text: "Кабак «Жидкое Мужество» встречает тебя гулом голосов и запахом чего-то, что раньше явно было едой. За стойкой — гоблин [glow]Жидкарь[/glow], протирающий кружку той же тряпкой, которой только что протирал стол.\n\nОн окидывает тебя взглядом эксперта по чужим проблемам.",
+    illustration: 'tavern_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Спросить про кодовое слово", next: "ask_password" },
+      { text: "Заказать \"Жидкое Мужество\"", next: "buy_potion" },
+      { text: "Сразу пойти в подземелье", next: "dungeon_entrance" }
+    ]
+  },
+
+  ask_password: {
+    text: "Жидкарь наклоняется через стойку и шепчет заговорщицким тоном:\n\n\"[glow]Двойное яблоко[/glow]. Скажешь бюрократу у входа в подземелье — он растает, как мороженое в августе. Только не перепутай с одинарным яблоком, а то будет [shake]ХУЖЕ[/shake].\"",
+    illustration: 'tavern_scene',
+    voice: 'narrator',
+    onEnter: function (heroId, flags) { flags.knowsCode = true; },
+    choices: [
+      { text: "Заказать \"Жидкое Мужество\"", next: "buy_potion" },
+      { text: "Пойти в подземелье", next: "dungeon_entrance" }
+    ]
+  },
+
+  buy_potion: {
+    text: "Жидкарь наливает мутную дымящуюся жидкость. \"С тебя пять монет — или история про соседа, тут уж как договоримся.\"\n\nТы со скрипом расстаёшься с последними медяками и залпом пьёшь [glow]Жидкое Мужество[/glow]. Внутри теплеет, храбрость растёт, разум — как-то не особо.",
+    illustration: 'tavern_scene',
+    voice: 'narrator',
+    onEnter: function (heroId, flags) { flags.hasPotion = true; },
+    choices: [
+      { text: "Спросить про кодовое слово", next: "ask_password" },
+      { text: "Пойти в подземелье", next: "dungeon_entrance" }
+    ]
+  },
+
+  dungeon_entrance: {
+    text: "У ржавой двери подземелья восседает бюрократ-гоблин с печатью размером с его собственное самомнение.\n\n\"Документы. Код доступа. Справка о справке о справке,\" — бубнит он, даже не поднимая глаз.",
+    illustration: 'bureaucrat_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Назвать код \"Двойное яблоко\"", next: "code_success", requiresFlag: "knowsCode" },
+      { text: "Показать квитанцию как свою собственную", next: "code_success_receipt", requiresFlag: "item_receipt" },
+      { text: "Всучить банку майонеза вместо взятки", next: "code_success_bribe", requiresFlag: "item_mayo" },
+      { text: "Попытаться пройти нагло", next: "loop_denied" }
+    ]
+  },
+
+  loop_denied: {
+    text: "Бюрократ поднимает взгляд ровно настолько, чтобы произнести:\n\n\"[shake]ОТКАЗАНО[/shake].\"\n\nТы уточняешь, почему. \"Отказано\", — отвечает он с той же интонацией, что и в первый раз.",
+    illustration: 'bureaucrat_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Настаивать ещё раз", next: "loop_denied_2" },
+      { text: "Назвать код \"Двойное яблоко\"", next: "code_success", requiresFlag: "knowsCode" },
+      { text: "Развернуться и уйти домой", next: "game_over_bureaucracy" }
+    ]
+  },
+
+  loop_denied_2: {
+    text: "Бюрократ невозмутимо чеканит: \"[shake]ОТКАЗАНО[/shake]\", и на этот раз даже печать на столе смотрит на тебя с укоризной.",
+    illustration: 'bureaucrat_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Назвать код \"Двойное яблоко\"", next: "code_success", requiresFlag: "knowsCode" },
+      { text: "Сдаться и уйти домой", next: "game_over_bureaucracy" }
+    ]
+  },
+
+  code_success: {
+    text: "Бюрократ на миг замирает, будто ты произнёс тайное имя древнего бога отчётности.\n\nПечать глухо стукает по столу: \"Проходите. Программа лояльности, все дела.\" Дверь со скрипом открывается.",
+    illustration: 'bureaucrat_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Войти в подземелье", next: "boss_room" }
+    ]
+  },
+
+  code_success_receipt: {
+    text: "Ты суёшь бюрократу мятую квитанцию на загранпаспорт. Он долго щурится, узнаёт собственный почерк в графе \"отказано\", после чего молча пропускает тебя — видимо, из профессионального уважения к чужим бюрократическим мучениям.",
+    illustration: 'bureaucrat_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Войти в подземелье", next: "boss_room" }
+    ]
+  },
+
+  code_success_bribe: {
+    text: "Ты молча протягиваешь банку майонеза. Бюрократ смотрит на неё как на артефакт древности, шепчет \"Беру\" и открывает дверь личным ключом, не отходя от кассы.\n\nСовесть где-то тихо плачет, но дверь уже открыта.",
+    illustration: 'bureaucrat_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Войти в подземелье", next: "boss_room" }
+    ]
+  },
+
+  game_over_bureaucracy: {
+    text: "Ты разворачиваешься и уходишь домой досматривать катку. Мир Лок'тар не пострадал, а вот твоя репутация — местами.\n\n[shake]ПОТРАЧЕНО[/shake]",
+    illustration: 'gameover_scene',
+    voice: 'narrator',
+    ending: true
+  },
+
+  boss_room: {
+    text: "За дверью — пещера, где на троне из старых пультов восседает [glow]Мама[/glow]. Она медленно поднимает взгляд, и воздух наполняется угрозой уровня \"мама узнала про оценки\".\n\n\"Я. ЩАС. [shake]УЛЬТАНУ[/shake].\" — произносит она тоном, не терпящим возражений.",
+    illustration: 'boss_scene',
+    voice: 'narrator',
+    choices: [
+      { text: "Отвлечь банкой майонеза", next: "win_mayo", requiresFlag: "item_mayo" },
+      { text: "Отбиться игровой мышкой как кастетом", next: "win_mouse", requiresFlag: "item_mouse" },
+      { text: "Выпить остатки \"Жидкого Мужества\"", next: "win_potion", requiresFlag: "hasPotion" },
+      { text: "Встретить удар голыми руками", next: "game_over_mama" }
+    ]
+  },
+
+  win_mayo: {
+    text: "Ты швыряешь банку майонеза прямо на трон. Мама смотрит на пятно с таким лицом, будто это расстроило её сильнее любого ульта.\n\n\"Ты... ты серьёзно сейчас?\" — её ярость рассасывается на глазах, как утренний туман над остановкой бусика.",
+    illustration: 'victory_scene',
+    voice: 'narrator',
+    choices: [ { text: "Перевести дыхание", next: "victory" } ]
+  },
+
+  win_mouse: {
+    text: "Ты со всей дури впечатываешь мышку в подлокотник трона — раздаётся щелчок, будто кто-то наконец закрыл 300 вкладок разом.\n\nМама на секунду теряется: этот звук она узнаёт слишком хорошо, слишком много вечеров он доносился из твоей комнаты.",
+    illustration: 'victory_scene',
+    voice: 'narrator',
+    choices: [ { text: "Перевести дыхание", next: "victory" } ]
+  },
+
+  win_potion: {
+    text: "\"Жидкое Мужество\" даёт о себе знать. Ты делаешь шаг вперёд и с прямотой подвыпившего философа заявляешь:\n\n\"Мама, я всё объясню.\"\n\nКаким-то чудом это работает лучше любого щита и любой брони.",
+    illustration: 'victory_scene',
+    voice: 'narrator',
+    choices: [ { text: "Перевести дыхание", next: "victory" } ]
+  },
+
+  game_over_mama: {
+    text: "Мама молча приподнимает бровь. Для вселенной этого объяснения оказывается более чем достаточно.\n\nТы не успеваешь договорить.\n\n[shake]ПОТРАЧЕНО[/shake]",
+    illustration: 'gameover_scene',
+    voice: 'narrator',
+    ending: true
+  },
+
+  victory: {
+    text: "Мама выдыхает, откидывается на трон из старых пультов и наливает всем чаю. \"Ладно уж, живи,\" — говорит она, и где-то в чате друзей это назовут легендарной каткой.\n\n[glow]Лок'тар[/glow] снова спокоен — по крайней мере до следующего форса.\n\nКОНЕЦ. Двойное яблоко было паролем всё это время.",
+    illustration: 'victory_scene',
+    voice: 'narrator',
+    ending: true,
+    good: true
+  }
+};
+
+/* ===================== ПАРСЕР ЭФФЕКТОВ ===================== */
+function buildTokens(raw) {
+  const tokens = [];
+  const stack = [];
+  let i = 0;
+  while (i < raw.length) {
+    if (raw[i] === '[') {
+      const close = raw.indexOf(']', i);
+      if (close !== -1) {
+        const tag = raw.slice(i + 1, close);
+        if (/^\/?(shake|glow|fade)$/.test(tag)) {
+          if (tag[0] === '/') stack.pop();
+          else stack.push('fx-' + tag);
+          i = close + 1;
+          continue;
+        }
+      }
+    }
+    tokens.push({ ch: raw[i], cls: stack.slice() });
+    i++;
+  }
+  return tokens;
+}
+
+/* ===================== ТЕКСТОВЫЙ ДВИЖОК ===================== */
+let typingTimer = null;
+let typingTokens = null;
+let typingIndex = 0;
+let typingVoice = 'narrator';
+let isTyping = false;
+
+function resolveVoice(voiceKey) {
+  if (voiceKey === 'hero') return HEROES[state.heroId].voice;
+  return 'narrator';
+}
+
+function startTyping(rawText, voiceKey) {
+  const storyText = document.getElementById('storyText');
+  storyText.innerHTML = '';
+  typingTokens = buildTokens(rawText);
+  typingIndex = 0;
+  typingVoice = resolveVoice(voiceKey);
+  isTyping = true;
+  blipCounter = 0;
+  setChoicesEnabled(false);
+  clearInterval(typingTimer);
+  typingTimer = setInterval(typeStep, 34);
+}
+
+function typeStep() {
+  const storyText = document.getElementById('storyText');
+  if (typingIndex >= typingTokens.length) {
+    finishTyping();
+    return;
+  }
+  const t = typingTokens[typingIndex];
+  appendToken(storyText, t);
+  if (t.ch !== '\n') voiceBlip(typingVoice, t.ch);
+  typingIndex++;
+}
+
+function appendToken(container, t) {
+  if (t.ch === '\n') {
+    container.appendChild(document.createElement('br'));
+    return;
+  }
+  if (t.cls.length) {
+    const span = document.createElement('span');
+    span.className = t.cls.join(' ');
+    span.textContent = t.ch;
+    container.appendChild(span);
+  } else {
+    container.appendChild(document.createTextNode(t.ch));
+  }
+}
+
+function finishTyping() {
+  clearInterval(typingTimer);
+  isTyping = false;
+  setChoicesEnabled(true);
+}
+
+function skipTyping() {
+  if (!isTyping) return;
+  clearInterval(typingTimer);
+  const storyText = document.getElementById('storyText');
+  storyText.innerHTML = '';
+  for (let k = 0; k < typingTokens.length; k++) {
+    appendToken(storyText, typingTokens[k]);
+  }
+  finishTyping();
+}
+
+function setChoicesEnabled(enabled) {
+  const btns = document.querySelectorAll('.choiceBtn');
+  btns.forEach(b => { b.disabled = !enabled; });
+}
+
+/* ===================== НАВИГАЦИЯ ПО СЦЕНАМ ===================== */
+function goToScene(sceneId) {
+  const scene = scenes[sceneId];
+  state.sceneId = sceneId;
+
+  if (typeof scene.onEnter === 'function') {
+    scene.onEnter(state.heroId, state.flags);
+  }
+
+  drawIllustration(scene.illustration);
+
+  let rawText = typeof scene.text === 'function' ? scene.text() : scene.text;
+  if (state.heroId) rawText = rawText.split('{heroName}').join(HEROES[state.heroId].name);
+
+  document.getElementById('choicesPanel').style.display = 'block';
+  const choicesWrap = document.getElementById('choices');
+  const restartWrap = document.getElementById('restartWrap');
+  choicesWrap.innerHTML = '';
+
+  if (scene.ending) {
+    restartWrap.style.display = 'block';
+  } else {
+    restartWrap.style.display = 'none';
+    scene.choices.forEach(choice => {
+      if (choice.requiresFlag && !state.flags[choice.requiresFlag]) return;
+      if (choice.requiresNotFlag && state.flags[choice.requiresNotFlag]) return;
+      const btn = document.createElement('button');
+      btn.className = 'choiceBtn';
+      btn.textContent = choice.text;
+      btn.disabled = true;
+      btn.addEventListener('click', () => {
+        ensureAudio();
+        goToScene(choice.next);
+      });
+      choicesWrap.appendChild(btn);
+    });
+  }
+
+  startTyping(rawText, scene.voice);
+}
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  state.heroId = null;
+  state.sceneId = null;
+  state.flags = {};
+  showCharSelect();
+});
+
+document.getElementById('storyText').addEventListener('click', skipTyping);
+
+/* ===================== ЭКРАН ВЫБОРА ПЕРСОНАЖА ===================== */
+function showCharSelect() {
+  document.getElementById('charSelectWrap').style.display = 'block';
+  document.getElementById('storyWrap').style.display = 'none';
+  document.getElementById('choicesPanel').style.display = 'none';
+  drawIllustration('select_default');
+
+  const wrap = document.getElementById('charSelect');
+  wrap.innerHTML = '';
+  Object.values(HEROES).forEach(hero => {
+    const card = document.createElement('div');
+    card.className = 'charCard';
+    const cv = document.createElement('canvas');
+    cv.width = 32; cv.height = 32;
+    card.appendChild(cv);
+    const h3 = document.createElement('h3');
+    h3.textContent = hero.name;
+    card.appendChild(h3);
+    const p = document.createElement('p');
+    p.textContent = hero.desc;
+    card.appendChild(p);
+    card.addEventListener('click', () => {
+      ensureAudio();
+      state.heroId = hero.id;
+      state.flags = {};
+      document.getElementById('charSelectWrap').style.display = 'none';
+      document.getElementById('storyWrap').style.display = 'block';
+      goToScene('intro');
+    });
+    wrap.appendChild(card);
+    hero.portrait(cv.getContext('2d'));
+  });
+}
+
+/* ===================== ПИКСЕЛЬ-АРТ (низкое разрешение + pixelated) ===================== */
+function px(ctx, x, y, w, h, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, w, h);
+}
+function clearArt(ctx, bg) {
+  ctx.clearRect(0, 0, 32, 32);
+  px(ctx, 0, 0, 32, 32, bg || '#12131a');
+}
+
+function drawPortraitMark(ctx) {
+  clearArt(ctx, '#141922');
+  px(ctx, 10, 6, 12, 10, '#4a7c59');
+  px(ctx, 8, 16, 16, 10, '#3d6b4a');
+  px(ctx, 11, 9, 2, 2, '#ffffff');
+  px(ctx, 19, 9, 2, 2, '#ffffff');
+  px(ctx, 12, 4, 3, 3, '#2b2b2b');
+  px(ctx, 17, 4, 3, 3, '#2b2b2b');
+  px(ctx, 9, 20, 5, 3, '#1c1c1c');
+  px(ctx, 18, 20, 5, 3, '#1c1c1c');
+}
+function drawPortraitDrosip(ctx) {
+  clearArt(ctx, '#161512');
+  px(ctx, 10, 7, 12, 10, '#a8b23f');
+  px(ctx, 8, 17, 16, 9, '#8f992f');
+  px(ctx, 11, 10, 2, 2, '#1a1a1a');
+  px(ctx, 19, 10, 2, 2, '#1a1a1a');
+  px(ctx, 8, 5, 3, 5, '#7d8a2a');
+  px(ctx, 21, 5, 3, 5, '#7d8a2a');
+  px(ctx, 12, 22, 8, 3, '#d9c25c');
+}
+function drawPortraitDonimazik(ctx) {
+  clearArt(ctx, '#1a1420');
+  px(ctx, 9, 8, 14, 10, '#e0b98a');
+  px(ctx, 7, 18, 18, 9, '#caa26f');
+  px(ctx, 12, 11, 2, 2, '#2a2a2a');
+  px(ctx, 18, 11, 2, 2, '#2a2a2a');
+  px(ctx, 13, 21, 6, 4, '#f4f2e6');
+  px(ctx, 13, 21, 6, 2, '#ffe27a');
+  px(ctx, 22, 18, 4, 6, '#f4f2e6');
+}
+
+function drawArtCanvas(fn) {
+  const canvas = document.getElementById('artCanvas');
+  const ctx = canvas.getContext('2d');
+  clearArt(ctx, '#12131a');
+  fn(ctx);
+}
+
+function drawIntroForest(ctx) {
+  px(ctx, 0, 0, 32, 32, '#0e1a12');
+  px(ctx, 0, 20, 32, 12, '#16241a');
+  px(ctx, 4, 8, 3, 12, '#2e3d24');
+  px(ctx, 22, 6, 3, 14, '#2e3d24');
+  px(ctx, 3, 6, 5, 4, '#3f5a2f');
+  px(ctx, 21, 4, 5, 4, '#3f5a2f');
+  px(ctx, 14, 18, 4, 4, '#ff8c3b');
+  px(ctx, 15, 16, 2, 2, '#ffd166');
+  px(ctx, 13, 22, 6, 2, '#3a2a1a');
+}
+
+function drawBus(ctx) {
+  px(ctx, 0, 0, 32, 32, '#141821');
+  px(ctx, 4, 12, 24, 10, '#d9a441');
+  px(ctx, 4, 8, 24, 5, '#c98f2e');
+  px(ctx, 7, 13, 5, 4, '#8fd6ff');
+  px(ctx, 14, 13, 5, 4, '#8fd6ff');
+  px(ctx, 21, 13, 4, 4, '#8fd6ff');
+  px(ctx, 7, 23, 4, 4, '#1a1a1a');
+  px(ctx, 20, 23, 4, 4, '#1a1a1a');
+  px(ctx, 8, 24, 2, 2, '#666');
+  px(ctx, 21, 24, 2, 2, '#666');
+  px(ctx, 5, 9, 22, 2, '#ff3333');
+}
+
+function drawTavern(ctx) {
+  px(ctx, 0, 0, 32, 32, '#0d0f14');
+  px(ctx, 4, 12, 24, 16, '#4a3324');
+  px(ctx, 4, 8, 24, 5, '#2e2018');
+  px(ctx, 13, 20, 6, 8, '#1f150f');
+  px(ctx, 7, 15, 5, 5, '#ffd166');
+  px(ctx, 20, 15, 5, 5, '#ffd166');
+  px(ctx, 12, 6, 8, 3, '#c9a227');
+  px(ctx, 15, 3, 2, 4, '#8a6a1a');
+}
+
+function drawBureaucrat(ctx) {
+  px(ctx, 0, 0, 32, 32, '#161514');
+  px(ctx, 4, 18, 24, 10, '#5a4a30');
+  px(ctx, 12, 6, 8, 10, '#a8b23f');
+  px(ctx, 14, 9, 1, 2, '#1a1a1a');
+  px(ctx, 18, 9, 1, 2, '#1a1a1a');
+  px(ctx, 10, 4, 12, 3, '#3a3a3a');
+  px(ctx, 8, 19, 5, 4, '#e8e6df');
+  px(ctx, 19, 19, 5, 4, '#ff3333');
+}
+
+function drawBoss(ctx) {
+  px(ctx, 0, 0, 32, 32, '#1a0e14');
+  px(ctx, 6, 20, 20, 8, '#3a2a3a');
+  px(ctx, 9, 6, 14, 16, '#7a3b57');
+  px(ctx, 12, 12, 2, 3, '#ffd166');
+  px(ctx, 18, 12, 2, 3, '#ffd166');
+  px(ctx, 8, 4, 16, 3, '#4a2a3a');
+  px(ctx, 5, 10, 3, 8, '#7a3b57');
+  px(ctx, 24, 10, 3, 8, '#7a3b57');
+}
+
+function drawGameOver(ctx) {
+  px(ctx, 0, 0, 32, 32, '#1a0505');
+  px(ctx, 8, 10, 16, 12, '#2b0808');
+  px(ctx, 11, 14, 3, 3, '#ff3333');
+  px(ctx, 18, 14, 3, 3, '#ff3333');
+  px(ctx, 11, 20, 10, 2, '#ff3333');
+  px(ctx, 6, 6, 20, 2, '#ff3333');
+  px(ctx, 6, 24, 20, 2, '#ff3333');
+}
+
+function drawVictory(ctx) {
+  px(ctx, 0, 0, 32, 32, '#0f1a12');
+  px(ctx, 12, 18, 8, 8, '#ffd166');
+  px(ctx, 10, 16, 12, 3, '#e8b93a');
+  px(ctx, 14, 26, 4, 2, '#8a6a1a');
+  px(ctx, 15, 6, 2, 2, '#ffe27a');
+  px(ctx, 8, 9, 2, 2, '#8fd6ff');
+  px(ctx, 22, 9, 2, 2, '#8fd6ff');
+  px(ctx, 5, 4, 2, 2, '#ff9de2');
+  px(ctx, 25, 4, 2, 2, '#ff9de2');
+}
+
+function drawPocketsItem(ctx) {
+  px(ctx, 0, 0, 32, 32, '#12131a');
+  const hero = HEROES[state.heroId];
+  if (!hero) { px(ctx, 12, 12, 8, 8, '#ffd166'); return; }
+  if (hero.id === 'mark') {
+    px(ctx, 9, 14, 14, 8, '#3a3a3a');
+    px(ctx, 12, 12, 8, 3, '#555');
+    px(ctx, 22, 17, 6, 1, '#888');
+  } else if (hero.id === 'drosip') {
+    px(ctx, 8, 10, 16, 14, '#e8e6df');
+    px(ctx, 10, 14, 12, 1, '#8a8a8a');
+    px(ctx, 10, 17, 12, 1, '#8a8a8a');
+    px(ctx, 10, 20, 8, 1, '#8a8a8a');
+  } else {
+    px(ctx, 11, 8, 10, 16, '#f4f2e6');
+    px(ctx, 11, 8, 10, 4, '#ffe27a');
+    px(ctx, 13, 14, 6, 6, '#f7f0d0');
+  }
+}
+
+const ILLUSTRATIONS = {
+  select_default: drawVictory,
+  intro_forest: drawIntroForest,
+  bus_scene: drawBus,
+  tavern_scene: drawTavern,
+  bureaucrat_scene: drawBureaucrat,
+  boss_scene: drawBoss,
+  gameover_scene: drawGameOver,
+  victory_scene: drawVictory,
+  pockets_item: drawPocketsItem
+};
+
+function drawIllustration(key) {
+  const fn = ILLUSTRATIONS[key] || drawIntroForest;
+  drawArtCanvas(fn);
+}
+
+/* ===================== СТАРТ ===================== */
+showCharSelect();
+</script>
+</body>
+</html>
